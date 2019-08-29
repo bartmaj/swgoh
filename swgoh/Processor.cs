@@ -4,45 +4,39 @@ using System.Threading.Tasks;
 
 namespace Swgoh
 {
+    public class GenericProcessor<T>
+    {
+        public static async Task<T> LoadRecord(string url)
+        {
+            if (!ApiHelper.IsInitialized)
+                ApiHelper.InitializeClient();
+            using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
+            {
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadAsAsync<T>();
+                else
+                    throw new Exception(response.ReasonPhrase);
+            }
+        }
+    }
     public class Processor
     {
         public static async Task<PlayerModel> LoadPlayerInfo(int allyCode = 0)
         {
-            //429-716-858
             string url = $"https://swgoh.gg/api/player/{allyCode}/";
-
-            using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    PlayerModel player = await response.Content.ReadAsAsync<PlayerModel>();
-
-                    return player;
-                }
-                else
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
-            }
+            return await GenericProcessor<PlayerModel>.LoadRecord(url);
         }
 
         public static async Task<CharacterModel> LoadCharacterInfo(int characterId)
         {
             string url = $"https://swgoh.gg/api/characters/{characterId}/";
+            return await GenericProcessor<CharacterModel>.LoadRecord(url);
+        }
 
-            using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    CharacterModel character = await response.Content.ReadAsAsync<CharacterModel>();
-
-                    return character;
-                }
-                else
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
-            }
+        public static async Task<CharacterModel[]> LoadCharacterList()
+        {
+            string url = $"https://swgoh.gg/api/characters/";
+            return await GenericProcessor<CharacterModel[]>.LoadRecord(url);
         }
     }
 }

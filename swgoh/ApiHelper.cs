@@ -7,7 +7,7 @@ namespace Swgoh
     public static class ApiHelper
     {
         public static HttpClient ApiClient { get; set; }
-
+        public static bool IsInitialized { get; set; } = false;
 
         public static void InitializeClient()
         {
@@ -15,6 +15,7 @@ namespace Swgoh
             ApiClient.BaseAddress = new Uri("https://swgoh.gg/api/");
             ApiClient.DefaultRequestHeaders.Accept.Clear();
             ApiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            IsInitialized = true;
         }
     }
 }
